@@ -160,7 +160,7 @@ strip.addEventListener('scroll', () => {
   stripScrollTimer = setTimeout(() => {
     if (!stripMobile.matches) return;
     stripIndex = Math.round(strip.scrollLeft / strip.clientWidth);
-    document.querySelector('.strip-status').textContent = `${stripIndex + 1} of ${stripSlides.length}: ${stripSlides[stripIndex].textContent.replace('✳', '').trim()}`;
+    document.querySelector('.strip-status').textContent = `${stripIndex + 1} of ${stripSlides.length}: ${stripSlides[stripIndex].textContent.trim()}`;
   }, 150);
 }, { passive: true });
 new ResizeObserver(() => {
