@@ -1,0 +1,17 @@
+!dist
+!dist/**
+build_natural_flight.py
+create_flight_layers.py
+restore_logo.py
+split_logo.py
+crow-flight-reference.gif
+crow-natural-flight-review.jpg
+crow-reference-frames.jpg
+logo-color-corrected-draft.png
+logo-restored-draft.png
+logo-transparency-review.jpg
+README.md
+dist/oldcrow.jpg
+dist/oldcrow-restored.png
+dist/oldcrow-flight-body.png
+dist/oldcrow-flight-wing.png
