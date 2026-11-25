@@ -5,12 +5,14 @@ import os from 'node:os';
 import path from 'node:path';
 
 process.chdir(await mkdtemp(path.join(os.tmpdir(), 'oc-')));
-delete process.env.BLOB_READ_WRITE_TOKEN;
-delete process.env.VERCEL;
+// Hermetic: never touch a real store, even when run inside a Vercel build with credentials.
+process.env.OC_STORAGE = 'local';
+for (const key of Object.keys(process.env)) if (/^BLOB_|_READ_WRITE_TOKEN$|^VERCEL(_OIDC_TOKEN)?$/.test(key)) delete process.env[key];
 process.env.ADMIN_PASSWORD = 'test-pass';
 
 const { handle } = await import(new URL('../lib/router.mjs', import.meta.url));
-const { sanitize } = await import(new URL('../lib/store.mjs', import.meta.url));
+const { sanitize, storageMode } = await import(new URL('../lib/store.mjs', import.meta.url));
+assert.equal(storageMode(), 'local-files', 'tests must use local storage only');
 const base = 'http://localhost';
 const call = (p, init = {}) => handle(new Request(base + p, { ...init, headers: { 'x-admin': '1', ...(init.headers || {}) } }));
 
@@ -81,6 +83,11 @@ assert.ok(!page.includes('class="menu-grid"'), 'typed menu hidden while upload i
 withFile.menu.files[0].live = false;
 await authed('/api/content', { method: 'PUT', body: JSON.stringify(withFile) });
 assert.match(await (await call('/menu')).text(), /class="menu-grid"/);
+
+// reset-to-original endpoint returns the defaults, not the edited content
+const original = await (await authed('/api/content?defaults=1')).json();
+assert.equal(original.home.hero.title, 'GOOD COFFEE.\nGOOD PEOPLE.\nOLD CROW.');
+assert.equal(original.menu.files.length, 0);
 
 // sanitize tolerates garbage
 assert.doesNotThrow(() => sanitize({ site: 5, home: { ticker: 'x' }, hours: 'y', menu: { categories: [null, 3], files: [{}] } }));
