@@ -26,6 +26,11 @@
   .oc-bar button:hover{background:#a94729}
   .oc-bar button[data-act=remove]:hover{background:#b3261e}
   .oc-toast{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);background:#262820;color:#fff;padding:10px 14px;font:600 13px/1.3 'DM Sans',sans-serif;z-index:99999;max-width:90vw}
+  .oc-edit footer [data-edit]{padding:3px 6px;margin:-3px -6px}
+  .oc-edit footer [data-edit]:hover{outline-color:#cd744f}
+  .oc-edit footer [data-edit]:focus{outline-color:#cd744f;background:rgba(255,255,255,.14)}
+  .oc-edit .announcement [data-edit]:hover{outline-color:#cd744f}
+  .oc-edit .announcement [data-edit]:focus{outline-color:#cd744f;background:rgba(255,255,255,.14)}
   .oc-edit .strip-slide{position:relative}
   .oc-edit .menu-col>h2,.oc-edit .hours>div{position:relative}
   `;

@@ -261,6 +261,7 @@ function siteTab() {
       field('Business name', 'site.name'), field('Short name (logo text and footer)', 'site.shortName'),
       h('div', { class: 'grid2' }, field('Top banner message', 'site.announcement'), field('Top banner, right side', 'site.announcementTag')),
       field('Footer message', 'site.footerTagline', { rows: 2 }), field('Footer location', 'site.footerLocation'),
+      field('Footer credit line (optional)', 'site.footerCredit', { help: 'Shown in the footer only when filled in, for example a photo credit if a stock photo requires one.' }),
       field('Search result description (home page)', 'site.metaDescription', { rows: 3, help: 'What Google shows under the site name.' }),
       field('Search result description (menu page)', 'menu.metaDescription', { rows: 3 })),
     h('div', { class: 'card' }, h('h2', {}, 'Start over'),
