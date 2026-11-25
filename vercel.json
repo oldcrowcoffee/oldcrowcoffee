@@ -3,6 +3,12 @@
   "framework": null,
   "cleanUrls": true,
   "buildCommand": "npm run check",
-  "installCommand": "",
-  "outputDirectory": "dist"
+  "outputDirectory": "dist",
+  "rewrites": [
+    { "source": "/", "destination": "/api/page/home" },
+    { "source": "/menu", "destination": "/api/page/menu" }
+  ],
+  "headers": [
+    { "source": "/admin", "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }, { "key": "Cache-Control", "value": "no-store" }] }
+  ]
 }

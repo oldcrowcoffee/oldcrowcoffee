@@ -2,33 +2,56 @@
 
 Responsive, dependency-free website for Old Crow Coffee Company in Springfield, Oregon.
 
+## Editing the site (CMS)
+
+The owner edits everything at **/admin** (password protected):
+
+- **Menu tab**: upload a new menu (PDF or images) and switch it on, or edit the typed menu (sections, items, optional prices/descriptions, a "special notice" banner). The QR code always points at `/menu`, so changing the menu never means reprinting the QR code.
+- **Home page / Hours & contact / Site-wide tabs**: every piece of text, the main photo, hours, address, email, Facebook link and SEO descriptions.
+
+Press **Save & publish**; changes appear on the live site within about 30 seconds. Pages are rendered on the server from one content file (`lib/defaults.mjs` holds the starting content; edits are stored in Vercel Blob).
+
+### One-time Vercel setup
+
+1. **Storage**: in the Vercel project, Storage tab, create a **Blob** store (public) and connect it to the project. This adds `BLOB_READ_WRITE_TOKEN` automatically.
+2. **Password**: add environment variable `ADMIN_PASSWORD` (a long passphrase). Optionally add `SESSION_SECRET` (any long random string).
+3. Redeploy. Visit `/admin`, sign in, and share the password only with the owner.
+
+Without `ADMIN_PASSWORD` the admin stays locked; without a Blob store it shows a banner and cannot save.
+
+Uploads go through a Vercel function, which limits a request to about 4.5 MB: photos are shrunk automatically in the browser, and PDFs must be under 4 MB.
+
 ## Run locally
 
-Requires Node.js. No package installation is needed.
+Requires Node.js 20+.
 
 ```sh
+npm install
 npm run dev
 ```
 
-Open http://localhost:3000. Public website files are in `dist/`.
+Open http://localhost:3000 and http://localhost:3000/admin (local password `changeme`, or set `ADMIN_PASSWORD`). Locally, content and uploads are saved in `.data/` (git-ignored) unless `BLOB_READ_WRITE_TOKEN` is set.
 
 ```sh
-npm run check
+npm run check   # syntax checks + offline smoke tests
 ```
+
+## Layout
+
+- `dist/`: static files (CSS, images, `app.js`, admin UI `admin.html`/`admin.js`/`admin.css`)
+- `lib/`: content defaults and validation, storage, auth, page templates, router
+- `api/[...slug].js`: Vercel function serving `/`, `/menu` (via rewrites in `vercel.json`) and `/api/*`
+- `server.mjs`: local dev server using the same handlers
 
 ## Features
 
 - Responsive warm coffeehouse design and mobile swipe slider
 - Transparent brand logo and interactive crow flight, with reduced-motion support
-- Business address, hours, and email supplied by the owner
-- Full menu page at `/menu` (`dist/menu.html`), linked from the main navigation
-- Working QR code (`dist/menu-qr.svg`) that points to https://oldcrowcoffeedraft.vercel.app/menu
-
-To change menu items, edit `dist/menu.html`. If the site domain changes, regenerate the QR code (for example with the Python `segno` package) for the new `/menu` URL.
+- Menu QR code (`dist/menu-qr.svg`) pointing to https://oldcrowcoffeedraft.vercel.app/menu. If the site domain changes, regenerate the QR code (for example with the Python `segno` package) for the new `/menu` URL and update the address in the admin Site-wide tab.
 
 ## Deployment
 
-Vercel serves `dist/` and runs `npm run check`, as configured in `vercel.json`.
+Vercel serves `dist/` plus the function in `api/`, and runs `npm run check` as the build step (`vercel.json`).
 The current live site is https://oldcrowcoffeedraft.vercel.app.
 Vercel account linking and credentials are not committed.
 

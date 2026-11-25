@@ -139,6 +139,7 @@ document.querySelectorAll('.crow-friend').forEach(crow => {
 
 // Native horizontal scrolling supports touch swipes without intercepting page scrolling.
 const strip = document.querySelector('#coffee-strip');
+if (strip) {
 const stripSlides = [...strip.querySelectorAll('.strip-slide')];
 const stripMobile = window.matchMedia('(max-width: 760px)');
 let stripIndex = 0;
@@ -167,3 +168,4 @@ new ResizeObserver(() => {
   strip.scrollTo({ left: stripMobile.matches ? stripIndex * strip.clientWidth : 0, behavior: 'instant' });
   strip.tabIndex = stripMobile.matches ? 0 : -1;
 }).observe(strip);
+}
