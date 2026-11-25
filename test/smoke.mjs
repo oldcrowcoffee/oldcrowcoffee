@@ -112,6 +112,24 @@ const original = await (await authed('/api/content?defaults=1')).json();
 assert.equal(original.home.hero.title, 'GOOD COFFEE.\nGOOD PEOPLE.\nOLD CROW.');
 assert.equal(original.menu.files.length, 0);
 
+// visual editor preview: signed-in only, renders the unsaved draft in edit mode
+assert.equal((await call('/api/preview', { method: 'POST', body: '{}' })).status, 401);
+const draft = await (await authed('/api/content?defaults=1')).json();
+draft.hours.push({ label: '', time: '' });
+draft.menu.categories[0].items.push({ name: '', price: '', desc: '' });
+res = await authed('/api/preview', { method: 'POST', body: JSON.stringify({ content: draft, page: 'home' }) });
+assert.equal(res.status, 200);
+let edit = await res.text();
+assert.match(edit, /data-edit="home\.hero\.title" data-kind="accent"/);
+assert.match(edit, /data-item="hours\.2"/, 'blank draft rows are kept so they can be filled in');
+assert.match(edit, /data-edit-img="home\.hero\.photo"/);
+assert.match(edit, /src="\/visual\.js"/);
+assert.ok(!edit.includes('/app.js'), 'site scripts are off in the editor');
+edit = await (await authed('/api/preview', { method: 'POST', body: JSON.stringify({ content: draft, page: 'menu' }) })).text();
+assert.match(edit, /data-add="menu\.categories\.0\.items"/);
+assert.match(edit, /data-edit="menu\.categories\.0\.items\.8\.name"/);
+assert.ok(!(await (await call('/')).text()).includes('data-edit'), 'public pages carry no editor markers');
+
 // sanitize tolerates garbage
 assert.doesNotThrow(() => sanitize({ site: 5, home: { ticker: 'x' }, hours: 'y', menu: { categories: [null, 3], files: [{}] } }));
 

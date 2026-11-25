@@ -6,6 +6,8 @@ Responsive, dependency-free website for Old Crow Coffee Company in Springfield, 
 
 The owner edits everything at **/admin** (password protected):
 
+- **Visual editor tab (default)**: the real site, live inside the admin. Click any text to type over it, click the main photo to replace it, hover items for ↑ ↓ ✕ (and links for a 🔗 button), use the “+ Add” buttons for new menu items, sections, hours, paragraphs and highlights. Switch between the Home and Menu pages and between Desktop and Phone widths. Edits are drafts until **Save & publish**.
+
 - **Menu tab**: upload a new menu (PDF or images) and switch it on, or edit the typed menu (sections, items, optional prices/descriptions, a "special notice" banner). The QR code always points at `/menu-file`, which forwards to the live menu, so changing the menu never means reprinting the QR code.
 - **Home page / Hours & contact / Site-wide tabs**: every piece of text, the main photo, hours, address, email, Facebook link and SEO descriptions.
 
@@ -38,9 +40,9 @@ npm run check   # syntax checks + offline smoke tests
 
 ## Layout
 
-- `dist/`: static files (CSS, images, `app.js`, admin UI `admin.html`/`admin.js`/`admin.css`)
+- `dist/`: static files (CSS, images, `app.js`, admin UI `admin.html`/`admin.js`/`admin.css`, and `visual.js`, the in-page editor that only runs inside the admin preview)
 - `lib/`: content defaults and validation, storage, auth, page templates, router
-- `api/*.js`: one tiny Vercel function per endpoint (`page`, `menu-file`, `qr`, `session`, `login`, `logout`, `content`, `upload`), all running `lib/router.mjs`. `/` and `/menu` reach `api/page.js` through rewrites in `vercel.json`. Keep these single-level: Vercel does not route nested `/api/a/b` paths to a catch-all file.
+- `api/*.js`: one tiny Vercel function per endpoint (`page`, `preview`, `menu-file`, `qr`, `session`, `login`, `logout`, `content`, `upload`), all running `lib/router.mjs`. `/` and `/menu` reach `api/page.js` through rewrites in `vercel.json`. Keep these single-level: Vercel does not route nested `/api/a/b` paths to a catch-all file.
 - `server.mjs`: local dev server using the same handlers
 
 ## Features
