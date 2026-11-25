@@ -44,24 +44,33 @@
   // ----- text -----
   const valueOf = el => {
     let t = el.innerText.replace(/\r/g, '').replace(/ /g, ' ');
-    if (el.dataset.kind === 'text') return t.replace(/\s*\n+\s*/g, ' ').trim();
+    if (el.dataset.kind === 'text' || el.dataset.kind === 'email') return t.replace(/\s*\n+\s*/g, ' ').trim();
     return t.replace(/\n+$/, '');
   };
   document.querySelectorAll('[data-edit]').forEach(el => {
     el.setAttribute('contenteditable', 'plaintext-only');
     if (el.contentEditable !== 'plaintext-only') el.setAttribute('contenteditable', 'true'); // older Firefox
     el.setAttribute('spellcheck', 'true');
+    const isEmail = el.dataset.kind === 'email';
+    el.addEventListener('focus', () => { el._orig = B.get(el.dataset.edit); });
     el.addEventListener('input', () => B.set(el.dataset.edit, valueOf(el)));
     el.addEventListener('keydown', e => {
-      if (e.key === 'Enter' && el.dataset.kind === 'text') { e.preventDefault(); el.blur(); }
+      if (e.key === 'Enter' && (el.dataset.kind === 'text' || el.dataset.kind === 'email')) { e.preventDefault(); el.blur(); }
       e.stopPropagation(); // keep the page's own key handlers (arrows, space) out of the way while typing
     });
     el.addEventListener('paste', e => {
       e.preventDefault();
       const text = (e.clipboardData || window.clipboardData).getData('text/plain');
-      document.execCommand('insertText', false, el.dataset.kind === 'text' ? text.replace(/\s*\n+\s*/g, ' ') : text);
+      document.execCommand('insertText', false, el.dataset.kind !== 'multiline' && el.dataset.kind !== 'lines' && el.dataset.kind !== 'accent' ? text.replace(/\s*\n+\s*/g, ' ') : text);
     });
-    el.addEventListener('blur', () => { if (!el.textContent.trim()) el.textContent = ''; }); // lets the placeholder show
+    el.addEventListener('blur', () => {
+      if (!el.textContent.trim()) el.textContent = ''; // lets the placeholder show
+      if (isEmail) {
+        const v = valueOf(el);
+        if (v && !/^[^\s@<>"]+@[^\s@<>"]+\.[^\s@<>"]+$/.test(v)) { B.set(el.dataset.edit, el._orig || ''); el.textContent = el._orig || ''; toast('That does not look like an email address, so it was not changed.'); }
+        else el.setAttribute('href', `mailto:${v}`);
+      }
+    });
   });
 
   // ----- links and navigation -----

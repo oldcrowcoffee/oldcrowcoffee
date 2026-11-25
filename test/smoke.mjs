@@ -22,6 +22,7 @@ let page = await res.text();
 assert.equal(res.status, 200);
 assert.match(page, /GOOD COFFEE\.<br>GOOD PEOPLE\.<br><span>OLD CROW\.<\/span>/);
 assert.match(page, /6900 Main Street/);
+assert.ok(!page.includes('qr-note'), 'no address printed next to the QR code');
 assert.ok(!/Syauqy|unsplash\.com\/photos/.test(page), 'no photographer credit in the footer');
 assert.match(page, /<h2>A small stop\.<br><span>A bright spot in your day\.<\/span><\/h2>/);
 assert.match(page, /01 \/ A LOCAL KIND OF LOVE/);
@@ -127,11 +128,20 @@ assert.match(edit, /data-edit-img="home\.hero\.photo"/);
 assert.match(edit, /<bdi data-edit="site\.name"/, 'footer business name is editable');
 assert.match(edit, /data-edit="site\.footerCredit"/, 'optional footer credit slot is editable');
 assert.match(edit, /src="\/visual\.js"/);
+for (const path of ['site.navStory', 'site.navMenu', 'site.navFind', 'site.navToggle', 'site.backToTop', 'site.brandSub', 'site.email', 'home.crow.hint', 'home.crow.hintTouch']) {
+  assert.ok(edit.includes(`data-edit="${path}"`), `${path} is editable in the visual editor`);
+}
 assert.ok(!edit.includes('/app.js'), 'site scripts are off in the editor');
 edit = await (await authed('/api/preview', { method: 'POST', body: JSON.stringify({ content: draft, page: 'menu' }) })).text();
 assert.match(edit, /data-add="menu\.categories\.0\.items"/);
 assert.match(edit, /data-edit="menu\.categories\.0\.items\.8\.name"/);
 assert.ok(!(await (await call('/')).text()).includes('data-edit'), 'public pages carry no editor markers');
+
+// crow messages are configurable and reach the page for app.js
+const crowDraft = await (await authed('/api/content')).json();
+crowDraft.home.crow.neighborMessages = ['Hi <there>'];
+await authed('/api/content', { method: 'PUT', body: JSON.stringify(crowDraft) });
+assert.match(await (await call('/')).text(), /data-messages="\[&quot;Hi &lt;there&gt;&quot;\]"/);
 
 // sanitize tolerates garbage
 assert.doesNotThrow(() => sanitize({ site: 5, home: { ticker: 'x' }, hours: 'y', menu: { categories: [null, 3], files: [{}] } }));
