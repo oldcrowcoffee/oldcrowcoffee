@@ -2,7 +2,11 @@
 const app = document.getElementById('app');
 let data = null;
 let session = { authed: false, enabled: true, storage: 'local-files' };
-let tab = 'menu';
+let tab = 'visual';
+let visualPage = 'home';
+let visualDevice = 'desktop';
+let previewFrame = null;
+let previewSeq = 0;
 let dirty = false;
 let saving = false;
 let status = { text: '', kind: '' };
@@ -270,8 +274,52 @@ function siteTab() {
       h('p', { class: 'help' }, 'The main photo is edited on the Home page tab. The logo and crow artwork are part of the site’s design files; ask your developer to change those.')));
 }
 
+
+// ---------- visual editor ----------
+// The preview frame renders the real site in edit mode from the current (unsaved) draft. Typing in the frame writes
+// straight into `data`; adding/removing/moving items asks the server for a fresh render of the draft.
+async function loadPreview() {
+  if (!previewFrame) return;
+  const seq = ++previewSeq;
+  let scroll = 0;
+  try { scroll = previewFrame.contentWindow.scrollY || 0; } catch { /* first load */ }
+  try {
+    const res = await fetch('/api/preview', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json', 'X-Admin': '1' }, body: JSON.stringify({ content: data, page: visualPage }) });
+    if (res.status === 401) { session.authed = false; showLogin('Your session ended. Please sign in again.'); return; }
+    if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || 'Preview failed.');
+    const html = await res.text();
+    if (seq !== previewSeq || !previewFrame) return;
+    previewFrame.addEventListener('load', () => { try { previewFrame.contentWindow.scrollTo(0, scroll); } catch { /* ignore */ } }, { once: true });
+    previewFrame.srcdoc = html;
+  } catch (err) { say(err.message, 'bad'); }
+}
+
+window.ocBridge = {
+  get: path => get(data, path),
+  set: (path, value) => { set(data, path, value); touch(); },
+  insert: (listPath, index, item) => { const arr = get(data, listPath); arr.splice(index == null ? arr.length : index, 0, JSON.parse(JSON.stringify(item))); touch(); loadPreview(); },
+  remove: (listPath, index) => { get(data, listPath).splice(index, 1); touch(); loadPreview(); },
+  move: (listPath, index, delta) => { move(get(data, listPath), index, delta); touch(); loadPreview(); },
+  upload: async file => (await uploadFile(file, { maxSide: 1800 })).url
+};
+
+function visualTab() {
+  previewFrame = h('iframe', { class: 'preview-frame ' + visualDevice, title: 'Live site preview, click text to edit' });
+  const seg = (label, active, onclick) => h('button', { class: 'seg' + (active ? ' on' : ''), type: 'button', 'aria-pressed': String(active), onclick }, label);
+  const bar = h('div', { class: 'vbar' },
+    h('div', { class: 'segs', role: 'group', 'aria-label': 'Page' },
+      seg('Home page', visualPage === 'home', () => { visualPage = 'home'; render(); }),
+      seg('Menu page', visualPage === 'menu', () => { visualPage = 'menu'; render(); })),
+    h('div', { class: 'segs', role: 'group', 'aria-label': 'Device' },
+      seg('Desktop', visualDevice === 'desktop', () => { visualDevice = 'desktop'; previewFrame.className = 'preview-frame desktop'; render(); }),
+      seg('Phone', visualDevice === 'phone', () => { visualDevice = 'phone'; render(); })),
+    h('span', { class: 'help vhint' }, 'Click any text to type. Click the main photo to replace it. Hover items for ↑ ↓ ✕ and “+ Add” buttons. Press Save & publish when you are done.'));
+  loadPreview();
+  return h('div', { class: 'visual' }, bar, h('div', { class: 'frame-wrap' }, previewFrame));
+}
+
 // ---------- shell ----------
-const tabs = [['menu', 'Menu'], ['home', 'Home page'], ['info', 'Hours & contact'], ['site', 'Site-wide']];
+const tabs = [['visual', 'Visual editor'], ['menu', 'Menu & uploads'], ['home', 'Home page text'], ['info', 'Hours & contact'], ['site', 'Site-wide']];
 const topEl = h('div', { class: 'top' });
 const panelEl = h('div', { class: 'panel', role: 'tabpanel' });
 const tabsEl = h('div', { class: 'tabs', role: 'tablist' });
@@ -290,7 +338,9 @@ function renderTop() {
 function render() {
   const scroll = window.scrollY;
   tabsEl.replaceChildren(...tabs.map(([id, label]) => h('button', { class: 'tab', role: 'tab', type: 'button', 'aria-selected': String(tab === id), onclick: () => { tab = id; render(); window.scrollTo(0, 0); } }, label)));
-  const body = { menu: menuTab, home: homeTab, info: infoTab, site: siteTab }[tab]();
+  panelEl.className = 'panel' + (tab === 'visual' ? ' wide' : '');
+  if (tab !== 'visual') previewFrame = null;
+  const body = { visual: visualTab, menu: menuTab, home: homeTab, info: infoTab, site: siteTab }[tab]();
   panelEl.replaceChildren(...[
     session.storage === 'none' ? h('div', { class: 'banner' }, 'Saving is not set up yet. In Vercel, add a Blob store to this project (Storage tab), then redeploy.') : null,
     body].filter(Boolean));
