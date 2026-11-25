@@ -85,7 +85,21 @@ assert.equal(res.status, 302);
 assert.equal(res.headers.get('location'), new URL(file.url, base).href);
 res = await call('/menu-qr.svg');
 assert.match(res.headers.get('content-type'), /svg/);
-assert.match(await res.text(), /<svg/);
+const autoSvg = await res.text();
+assert.match(autoSvg, /<svg/);
+// custom address: ignored when signed out, honoured (and uncached) for the signed-in preview
+const custom = encodeURIComponent('https://example.com/other');
+assert.equal(await (await call(`/menu-qr.svg?u=${custom}`)).text(), autoSvg);
+res = await authed(`/menu-qr.svg?u=${custom}`);
+assert.notEqual(await res.text(), autoSvg);
+assert.equal(res.headers.get('cache-control'), 'no-store');
+// saved override changes the public QR
+const withQr = await (await authed('/api/content')).json();
+withQr.menu.qrUrl = 'https://example.com/saved';
+await authed('/api/content', { method: 'PUT', body: JSON.stringify(withQr) });
+assert.notEqual(await (await call('/menu-qr.svg')).text(), autoSvg);
+withQr.menu.qrUrl = 'javascript:alert(1)';
+assert.equal((await (await authed('/api/content', { method: 'PUT', body: JSON.stringify(withQr) })).json()).menu.qrUrl, '');
 
 // upload mode with nothing live falls back to the typed menu
 withFile.menu.files[0].live = false;
