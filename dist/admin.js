@@ -125,7 +125,7 @@ function menuTab() {
   return h('div', {},
     h('div', { class: 'card' },
       h('h2', {}, 'What people see when they scan the QR code'),
-      h('p', { class: 'help' }, 'The QR code always opens ', h('a', { href: '/menu', target: '_blank', rel: 'noopener' }, '/menu'), '. Change what that page shows here and the printed QR code never needs replacing.'),
+      h('p', { class: 'help' }, 'The QR code always opens ', h('a', { href: '/menu-file', target: '_blank', rel: 'noopener' }, '/menu-file'), ', which forwards to your current menu. Change the menu here and the printed QR code never needs replacing.'),
       ['digital', 'upload'].map(value => h('label', { class: 'choice' },
         h('input', { type: 'radio', name: 'display', checked: m.display === value, onchange: () => { m.display = value; touch(); render(); } }),
         h('span', {}, value === 'digital' ? [h('b', {}, 'Typed menu'), 'The item lists you edit below, shown in the site’s style.'] : [h('b', {}, 'Uploaded menu (PDF or images)'), 'Show the menu file(s) you upload, exactly as designed.']))),
@@ -170,8 +170,8 @@ function menuTab() {
     h('div', { class: 'card' },
       h('h2', {}, 'Menu QR code'),
       h('div', { class: 'qr' }, h('img', { src: '/menu-qr.svg', alt: 'Menu QR code' }),
-        h('div', {}, h('p', { class: 'help' }, 'Points to ', h('strong', {}, `https://${data.site.domain}/menu`), '.'), h('a', { class: 'btn small', href: '/menu-qr.svg', download: 'old-crow-menu-qr.svg' }, 'Download QR code'),
-          h('p', { class: 'help' }, 'If the website address ever changes, the QR code must be regenerated and reprinted.'))),
+        h('div', {}, h('p', { class: 'help' }, 'Opens ', h('strong', {}, `https://${data.site.domain}/menu-file`), '.'), h('a', { class: 'btn small', href: '/menu-qr.svg', download: 'old-crow-menu-qr.svg' }, 'Download QR code'),
+          h('p', { class: 'help' }, 'Scanning opens the menu file directly when exactly one uploaded menu is switched on; with several files (or the typed menu) it opens the menu page. The code is built from the website address in the Site-wide tab, so check that address before printing it.'))),
       h('div', { class: 'grid2' }, field('Label next to QR on menu page', 'menu.qrLabel'), field('Text next to QR on menu page', 'menu.qrText'))));
 }
 

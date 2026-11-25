@@ -79,10 +79,19 @@ page = await (await call('/menu')).text();
 assert.match(page, new RegExp(`<img src="${file.url}" alt="Fall Menu"`));
 assert.ok(!page.includes('class="menu-grid"'), 'typed menu hidden while upload is live');
 
+// QR target forwards to the single live file; QR image is generated
+res = await call('/menu-file');
+assert.equal(res.status, 302);
+assert.equal(res.headers.get('location'), new URL(file.url, base).href);
+res = await call('/menu-qr.svg');
+assert.match(res.headers.get('content-type'), /svg/);
+assert.match(await res.text(), /<svg/);
+
 // upload mode with nothing live falls back to the typed menu
 withFile.menu.files[0].live = false;
 await authed('/api/content', { method: 'PUT', body: JSON.stringify(withFile) });
 assert.match(await (await call('/menu')).text(), /class="menu-grid"/);
+assert.equal((await call('/menu-file')).headers.get('location'), base + '/menu');
 
 // reset-to-original endpoint returns the defaults, not the edited content
 const original = await (await authed('/api/content?defaults=1')).json();

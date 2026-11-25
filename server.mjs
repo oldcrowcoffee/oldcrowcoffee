@@ -9,7 +9,7 @@ import { localUploadPath } from './lib/store.mjs';
 
 const root = path.resolve('dist');
 const types = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.svg': 'image/svg+xml', '.jpg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp', '.pdf': 'application/pdf' };
-const DYNAMIC = new Set(['/', '/menu']);
+const DYNAMIC = new Set(['/', '/menu', '/menu-file', '/menu-qr.svg']);
 
 async function sendFile(res, file) {
   const data = await readFile(file);

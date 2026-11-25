@@ -6,7 +6,7 @@ Responsive, dependency-free website for Old Crow Coffee Company in Springfield, 
 
 The owner edits everything at **/admin** (password protected):
 
-- **Menu tab**: upload a new menu (PDF or images) and switch it on, or edit the typed menu (sections, items, optional prices/descriptions, a "special notice" banner). The QR code always points at `/menu`, so changing the menu never means reprinting the QR code.
+- **Menu tab**: upload a new menu (PDF or images) and switch it on, or edit the typed menu (sections, items, optional prices/descriptions, a "special notice" banner). The QR code always points at `/menu-file`, which forwards to the live menu, so changing the menu never means reprinting the QR code.
 - **Home page / Hours & contact / Site-wide tabs**: every piece of text, the main photo, hours, address, email, Facebook link and SEO descriptions.
 
 Press **Save & publish**; changes appear on the live site within about 30 seconds. Pages are rendered on the server from one content file (`lib/defaults.mjs` holds the starting content; edits are stored in Vercel Blob).
@@ -40,14 +40,14 @@ npm run check   # syntax checks + offline smoke tests
 
 - `dist/`: static files (CSS, images, `app.js`, admin UI `admin.html`/`admin.js`/`admin.css`)
 - `lib/`: content defaults and validation, storage, auth, page templates, router
-- `api/*.js`: one tiny Vercel function per endpoint (`page`, `session`, `login`, `logout`, `content`, `upload`), all running `lib/router.mjs`. `/` and `/menu` reach `api/page.js` through rewrites in `vercel.json`. Keep these single-level: Vercel does not route nested `/api/a/b` paths to a catch-all file.
+- `api/*.js`: one tiny Vercel function per endpoint (`page`, `menu-file`, `qr`, `session`, `login`, `logout`, `content`, `upload`), all running `lib/router.mjs`. `/` and `/menu` reach `api/page.js` through rewrites in `vercel.json`. Keep these single-level: Vercel does not route nested `/api/a/b` paths to a catch-all file.
 - `server.mjs`: local dev server using the same handlers
 
 ## Features
 
 - Responsive warm coffeehouse design and mobile swipe slider
 - Transparent brand logo and interactive crow flight, with reduced-motion support
-- Menu QR code (`dist/menu-qr.svg`) pointing to https://oldcrowcoffeedraft.vercel.app/menu. If the site domain changes, regenerate the QR code (for example with the Python `segno` package) for the new `/menu` URL and update the address in the admin Site-wide tab.
+- Menu QR code, generated at `/menu-qr.svg` from the website address saved in the admin (Site-wide tab). It encodes `/menu-file`, a permanent address that forwards to the live uploaded menu when exactly one is switched on, and to the `/menu` page otherwise. So replacing the menu never means reprinting the code; changing the website address does.
 
 ## Deployment
 
