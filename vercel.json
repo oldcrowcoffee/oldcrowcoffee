@@ -5,10 +5,28 @@
   "buildCommand": "npm run check",
   "outputDirectory": "dist",
   "rewrites": [
-    { "source": "/", "destination": "/api/page/home" },
-    { "source": "/menu", "destination": "/api/page/menu" }
+    {
+      "source": "/",
+      "destination": "/api/page?p=home"
+    },
+    {
+      "source": "/menu",
+      "destination": "/api/page?p=menu"
+    }
   ],
   "headers": [
-    { "source": "/admin", "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }, { "key": "Cache-Control", "value": "no-store" }] }
+    {
+      "source": "/admin",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        }
+      ]
+    }
   ]
 }

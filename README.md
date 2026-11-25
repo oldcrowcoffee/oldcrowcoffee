@@ -40,7 +40,7 @@ npm run check   # syntax checks + offline smoke tests
 
 - `dist/`: static files (CSS, images, `app.js`, admin UI `admin.html`/`admin.js`/`admin.css`)
 - `lib/`: content defaults and validation, storage, auth, page templates, router
-- `api/[...slug].js`: Vercel function serving `/`, `/menu` (via rewrites in `vercel.json`) and `/api/*`
+- `api/*.js`: one tiny Vercel function per endpoint (`page`, `session`, `login`, `logout`, `content`, `upload`), all running `lib/router.mjs`. `/` and `/menu` reach `api/page.js` through rewrites in `vercel.json`. Keep these single-level: Vercel does not route nested `/api/a/b` paths to a catch-all file.
 - `server.mjs`: local dev server using the same handlers
 
 ## Features
