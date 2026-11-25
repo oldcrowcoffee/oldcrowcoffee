@@ -233,6 +233,13 @@ function siteTab() {
       field('Search result description (home page)', 'site.metaDescription', { rows: 3, help: 'What Google shows under the site name.' }),
       field('Search result description (menu page)', 'menu.metaDescription', { rows: 3 }),
       field('Website address (shown next to the QR code)', 'site.domain', { help: 'Just the address, like oldcrowcoffee.com. Changing this does not change the QR code image.' })),
+    h('div', { class: 'card' }, h('h2', {}, 'Start over'),
+      h('p', { class: 'help' }, 'Puts every text, the menu and hours back to the original site content. Uploaded menus are removed from the page. Nothing changes on the live site until you press Save & publish.'),
+      h('button', { class: 'btn danger', type: 'button', onclick: async () => {
+        if (!confirm('Replace everything on this page with the original content? You can still leave without saving.')) return;
+        try { data = await api('/api/content?defaults=1'); touch(); render(); say('Original content loaded. Press Save & publish to apply it.', 'ok'); }
+        catch (err) { say(err.message, 'bad'); }
+      } }, 'Reset to original content')),
     h('div', { class: 'card' }, h('h2', {}, 'Photos & logo'),
       h('p', { class: 'help' }, 'The main photo is edited on the Home page tab. The logo and crow artwork are part of the site’s design files; ask your developer to change those.')));
 }
