@@ -47,7 +47,7 @@ npm run check   # syntax checks + offline smoke tests
 
 - Responsive warm coffeehouse design and mobile swipe slider
 - Transparent brand logo and interactive crow flight, with reduced-motion support
-- Menu QR code, generated at `/menu-qr.svg` from the website address saved in the admin (Site-wide tab). It encodes `/menu-file`, a permanent address that forwards to the live uploaded menu when exactly one is switched on, and to the `/menu` page otherwise. So replacing the menu never means reprinting the code; changing the website address does.
+- Menu QR code, generated at `/menu-qr.svg`. By default it encodes this site's own `/menu-file` address, which forwards to the live uploaded menu when exactly one is switched on and to the `/menu` page otherwise, so replacing the menu never means reprinting the code. The address is editable (with live preview and download) in the admin Menu tab; custom addresses must be https.
 
 ## Deployment
 

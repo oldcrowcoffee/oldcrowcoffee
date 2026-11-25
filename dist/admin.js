@@ -167,12 +167,39 @@ function menuTab() {
       h('div', { class: 'row' }, h('button', { class: 'btn', type: 'button', onclick: () => { m.categories.push({ name: '', items: [{ name: '', price: '', desc: '' }] }); touch(); render(); } }, '+ Add section')),
       field('Note under the menu', 'menu.kidsNote')),
 
-    h('div', { class: 'card' },
-      h('h2', {}, 'Menu QR code'),
-      h('div', { class: 'qr' }, h('img', { src: '/menu-qr.svg', alt: 'Menu QR code' }),
-        h('div', {}, h('p', { class: 'help' }, 'Opens ', h('strong', {}, `https://${data.site.domain}/menu-file`), '.'), h('a', { class: 'btn small', href: '/menu-qr.svg', download: 'old-crow-menu-qr.svg' }, 'Download QR code'),
-          h('p', { class: 'help' }, 'Scanning opens the menu file directly when exactly one uploaded menu is switched on; with several files (or the typed menu) it opens the menu page. The code is built from the website address in the Site-wide tab, so check that address before printing it.'))),
-      h('div', { class: 'grid2' }, field('Label next to QR on menu page', 'menu.qrLabel'), field('Text next to QR on menu page', 'menu.qrText'))));
+    qrCard());
+}
+
+function qrCard() {
+  const m = data.menu;
+  const auto = `${location.origin}/menu-file`;
+  const preview = h('img', { alt: 'Menu QR code', src: '/menu-qr.svg' });
+  const download = h('a', { class: 'btn small', href: '/menu-qr.svg', download: 'old-crow-menu-qr.svg' }, 'Download QR code');
+  const warn = h('p', { class: 'err', hidden: true }, 'The address must start with https://');
+  const input = h('input', { type: 'text', inputmode: 'url', spellcheck: 'false' });
+  const refresh = () => {
+    const value = input.value.trim();
+    const ok = /^https:\/\/\S{4,}$/.test(value);
+    warn.hidden = ok || value === '';
+    const src = `/menu-qr.svg?u=${encodeURIComponent(ok ? value : auto)}&t=${Date.now()}`;
+    preview.src = src; download.href = src;
+  };
+  const apply = value => { m.qrUrl = value === auto ? '' : value; input.value = value; touch(); refresh(); };
+  input.value = m.qrUrl || auto;
+  input.addEventListener('input', () => { const v = input.value.trim(); m.qrUrl = v === auto ? '' : v; touch(); refresh(); });
+  if (m.qrUrl) refresh();
+  return h('div', { class: 'card' },
+    h('h2', {}, 'Menu QR code'),
+    h('div', { class: 'qr' }, preview,
+      h('div', { style: 'flex:1;min-width:240px' },
+        h('label', { class: 'f', style: 'margin-top:0' }, 'Address the QR code opens', input),
+        warn,
+        h('div', { class: 'row' },
+          h('button', { class: 'btn small', type: 'button', onclick: () => apply(auto) }, 'Menu, automatic (recommended)'),
+          h('button', { class: 'btn small', type: 'button', onclick: () => apply(`${location.origin}/menu`) }, 'Menu page'),
+          download),
+        h('p', { class: 'help' }, 'Automatic opens the menu file directly when exactly one uploaded menu is switched on, and the menu page otherwise, so you never reprint it after uploading a new menu. You can also paste any https:// address. Press Save & publish to make a change permanent; the preview and download update as you type.'))),
+    h('div', { class: 'grid2' }, field('Label next to QR on menu page', 'menu.qrLabel'), field('Text next to QR on menu page', 'menu.qrText')));
 }
 
 function homeTab() {
@@ -231,8 +258,7 @@ function siteTab() {
       h('div', { class: 'grid2' }, field('Top banner message', 'site.announcement'), field('Top banner, right side', 'site.announcementTag')),
       field('Footer message', 'site.footerTagline', { rows: 2 }), field('Footer location', 'site.footerLocation'),
       field('Search result description (home page)', 'site.metaDescription', { rows: 3, help: 'What Google shows under the site name.' }),
-      field('Search result description (menu page)', 'menu.metaDescription', { rows: 3 }),
-      field('Website address (shown next to the QR code)', 'site.domain', { help: 'Just the address, like oldcrowcoffee.com. Changing this does not change the QR code image.' })),
+      field('Search result description (menu page)', 'menu.metaDescription', { rows: 3 })),
     h('div', { class: 'card' }, h('h2', {}, 'Start over'),
       h('p', { class: 'help' }, 'Puts every text, the menu and hours back to the original site content. Uploaded menus are removed from the page. Nothing changes on the live site until you press Save & publish.'),
       h('button', { class: 'btn danger', type: 'button', onclick: async () => {
