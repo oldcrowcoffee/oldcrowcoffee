@@ -70,7 +70,7 @@ document.querySelectorAll('.crow-friend').forEach(crow => {
     document.body.append(flightLayer);
     art.style.visibility = 'hidden';
     crow.classList.add('is-flying');
-    reply.textContent = 'Caw! Be right back.';
+    reply.textContent = crow.dataset.away || 'Caw! Be right back.';
     const exitX = window.innerWidth - bounds.left + bounds.width;
     const exitY = -Math.min(220, Math.max(100, bounds.top * .45));
     flight = bird.animate([
@@ -86,7 +86,7 @@ document.querySelectorAll('.crow-friend').forEach(crow => {
     ], { duration: 4600, easing: 'ease-in-out' });
     flight.onfinish = () => {
       land();
-      reply.textContent = 'Back on my perch.';
+      reply.textContent = crow.dataset.back || 'Back on my perch.';
     };
   }
   function cancelHover() {
@@ -120,7 +120,9 @@ document.querySelectorAll('.crow-friend').forEach(crow => {
   crow.addEventListener('click', () => {
     clearTimeout(hoverTimer);
     if (flight) return;
-    const messages = crowMessages[crow.dataset.crow];
+    let messages = [];
+    try { messages = JSON.parse(crow.dataset.messages || '[]'); } catch { /* fall back below */ }
+    if (!messages.length) messages = crowMessages[crow.dataset.crow];
     reply.textContent = messages[visits++ % messages.length];
 
     if (!reducedMotion.matches) flyAway();

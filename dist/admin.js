@@ -146,7 +146,8 @@ function menuTab() {
         h('button', { class: 'btn small', type: 'button', 'aria-label': 'Move up', onclick: () => { move(m.files, i, -1); touch(); render(); } }, '↑'),
         h('button', { class: 'btn small', type: 'button', 'aria-label': 'Move down', onclick: () => { move(m.files, i, 1); touch(); render(); } }, '↓'),
         h('button', { class: 'btn small danger', type: 'button', onclick: () => { if (confirm(`Remove “${f.name}”? The file is deleted when you save.`)) { m.files.splice(i, 1); touch(); render(); } } }, 'Remove'))) : h('p', { class: 'help' }, 'Nothing uploaded yet.'),
-      h('div', { class: 'drop' }, h('button', { class: 'btn primary', type: 'button', onclick: () => fileInput.click() }, '+ Upload a menu'), fileInput)),
+      h('div', { class: 'drop' }, h('button', { class: 'btn primary', type: 'button', onclick: () => fileInput.click() }, '+ Upload a menu'), fileInput),
+      field('Text on the PDF button', 'menu.pdfLabel', { help: '{name} is replaced with the menu’s name.' })),
 
     h('div', { class: 'card' },
       h('h2', {}, 'Typed menu'),
@@ -232,7 +233,13 @@ function homeTab() {
     h('div', { class: 'card' }, h('h2', {}, 'Visit section'),
       field('Small heading', 'home.visit.eyebrow'), field('Title', 'home.visit.title', { rows: 2 }), field('Text', 'home.visit.text', { rows: 2 }), field('Directions button', 'home.visit.button'),
       h('div', { class: 'grid2' }, field('“Address” label', 'home.visit.spotLabel'), field('“Hours” label', 'home.visit.hoursLabel')),
-      field('“Contact” label', 'home.visit.helloLabel')));
+      field('“Contact” label', 'home.visit.helloLabel')),
+    h('div', { class: 'card' }, h('h2', {}, 'The crow mascot'),
+      h('p', { class: 'help' }, 'The hints under the crow can also be edited directly in the Visual editor. The speech bubbles appear when someone clicks or taps the crow, so they are edited here.'),
+      h('div', { class: 'grid2' }, field('Hint (mouse)', 'home.crow.hint'), field('Hint (touch screens)', 'home.crow.hintTouch')),
+      h('div', { class: 'grid2' }, field('When it flies away', 'home.crow.away'), field('When it comes back', 'home.crow.back')),
+      stringList('Story crow says (one at a time, in order)', 'home.crow.neighborMessages', { addLabel: 'Add message' }),
+      stringList('Menu crow says', 'home.crow.menuMessages', { addLabel: 'Add message' })));
 }
 
 function infoTab() {
@@ -264,6 +271,12 @@ function siteTab() {
       field('Footer credit line (optional)', 'site.footerCredit', { help: 'Shown in the footer only when filled in, for example a photo credit if a stock photo requires one.' }),
       field('Search result description (home page)', 'site.metaDescription', { rows: 3, help: 'What Google shows under the site name.' }),
       field('Search result description (menu page)', 'menu.metaDescription', { rows: 3 })),
+    h('div', { class: 'card' }, h('h2', {}, 'Navigation & small labels'),
+      h('p', { class: 'help' }, 'Most of these can also be edited directly in the Visual editor.'),
+      h('div', { class: 'grid2' }, field('Under the logo', 'site.brandSub'), field('Menu button on phones', 'site.navToggle')),
+      h('div', { class: 'grid2' }, field('Top menu: story', 'site.navStory'), field('Top menu: menu', 'site.navMenu')),
+      h('div', { class: 'grid2' }, field('Top menu: find us', 'site.navFind'), field('Footer: back to top', 'site.backToTop')),
+      field('Screen-reader “skip” link', 'site.skipLink', { help: 'Hidden until someone presses Tab on the keyboard, so it can only be edited here.' })),
     h('div', { class: 'card' }, h('h2', {}, 'Start over'),
       h('p', { class: 'help' }, 'Puts every text, the menu and hours back to the original site content. Uploaded menus are removed from the page. Nothing changes on the live site until you press Save & publish.'),
       h('button', { class: 'btn danger', type: 'button', onclick: async () => {
