@@ -12,6 +12,14 @@
     {
       "source": "/menu",
       "destination": "/api/page?p=menu"
+    },
+    {
+      "source": "/menu-file",
+      "destination": "/api/menu-file"
+    },
+    {
+      "source": "/menu-qr.svg",
+      "destination": "/api/qr"
     }
   ],
   "headers": [

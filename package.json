@@ -9,7 +9,8 @@
     "check": "node --check server.mjs && node --check dist/app.js && node --check dist/admin.js && node --check lib/defaults.mjs && node --check lib/store.mjs && node --check lib/auth.mjs && node --check lib/render.mjs && node --check lib/router.mjs && for f in api/*.js; do node --check \"$f\" || exit 1; done; OC_STORAGE=local node test/smoke.mjs"
   },
   "dependencies": {
-    "@vercel/blob": "^2.9.0"
+    "@vercel/blob": "^2.9.0",
+    "qrcode": "^1.5.4"
   },
   "engines": {
     "node": "22.x"
