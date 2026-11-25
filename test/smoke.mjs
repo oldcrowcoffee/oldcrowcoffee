@@ -22,6 +22,8 @@ assert.match(page, /GOOD COFFEE\.<br>GOOD PEOPLE\.<br><span>OLD CROW\.<\/span>/)
 assert.match(page, /6900 Main Street/);
 assert.match(page, /<h2>A small stop\.<br><span>A bright spot in your day\.<\/span><\/h2>/);
 assert.match(page, /01 \/ A LOCAL KIND OF LOVE/);
+assert.match(await (await call('/api/page?p=home')).text(), /GOOD COFFEE/);
+assert.match(await (await call('/api/page?p=menu')).text(), /House Coffee/);
 res = await call('/menu');
 page = await res.text();
 assert.match(page, /<li>House Coffee<\/li>/);
