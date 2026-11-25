@@ -61,6 +61,6 @@ Vercel account linking and credentials are not committed.
 
 The owner supplied the original logo in `dist/oldcrow.jpg`. The site uses the restored transparent version, `dist/oldcrow-transparent.png`, and separate bird/emblem layers. The Python asset scripts require Pillow and NumPy; they are not needed to run the website. Draft images are retained as inputs to the restoration scripts.
 
-The coffee photograph is illustrative stock, not a photograph of the business or its products. Photo by Syauqy Ayyash: https://unsplash.com/photos/a-cup-of-coffee-on-a-saucer-on-a-black-table-S-ACh5HiDNE . Fonts and the photograph load from external services.
+The default hero photo (an Unsplash stock image, https://unsplash.com/photos/a-cup-of-coffee-on-a-saucer-on-a-black-table-S-ACh5HiDNE by Syauqy Ayyash) is only a placeholder until the owner uploads their own in the visual editor; no on-site credit is shown. The footer has an optional, editable credit line (hidden when empty) for any future stock photo that needs one. Fonts load from external services.
 
 The airborne animation is a transparent, stabilized silhouette extracted from 36 frames of the user-supplied Tenor reference: https://tenor.com/view/epix-from-epix-crow-epix-from-gif-25283470 . `build_natural_flight.py` creates `dist/crow-natural-flight.webp` from `crow-flight-reference.gif`. The detailed logo crow remains visible while perched and transitions into the silhouette during flight.
